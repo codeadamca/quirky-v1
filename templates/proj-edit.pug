@@ -1,0 +1,25 @@
+extends layout 
+
+block layout-content 
+  h1.page-title Edit new project
+  //- /admin/menu/add/submit will be the location where the form data is submitted to
+  form(method="post", action="/admin/project/edit/submit")
+    div 
+        label(for="projId") Project Id: 
+        input(type="number", id="projId", name="projId" required)
+    div 
+        label(for="name") Website Name: 
+        input(type="text", id="name", name="web-name" required)
+    div 
+        label(for="user") User Name: 
+        input(type="text", id="user", name="username" placeholder="your github username" required)
+    div 
+        label(for="href") URI: 
+        input(type="text", id="href", name="path", placeholder="e.g. /my-project-page-uri" required)
+    div 
+        label(for="repo") Repo: 
+        input(type="text", id="repo", name="repo", placeholder="e.g. https://github.com/useless-web" required)
+    div 
+        label(for="imageName") Your Image: 
+        input(type="text", id="imageName", name="imageName" placeholder="e.g.myImage.png" required)
+    button(type="submit") Add the Project

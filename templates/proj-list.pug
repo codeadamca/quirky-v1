@@ -1,0 +1,25 @@
+extends layout
+
+block layout-content
+  h1.page-title Administer Directory Projects 
+  a(href="/admin/project/add") + Add new project
+  table 
+    thead 
+      th Image
+      th Project
+      th Author
+      th Operation 
+    tbody 
+      each proj in directory
+        tr 
+          td
+            img(src="/img/" + proj.screen)
+          td #{proj.website_name}
+          td #{proj.Github_username}
+          td
+            form(method="get", action="/admin/project/delete")
+              input(type="hidden", name="projId", value=proj._id)
+              button(type="submit") Delete
+            form(action="/admin/project/edit") 
+              input(type="hidden", name="projId", value=proj._id) 
+              button(type="submit") Edit
