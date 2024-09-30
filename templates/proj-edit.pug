@@ -5,9 +5,6 @@ block layout-content
   //- /admin/menu/add/submit will be the location where the form data is submitted to
   form(method="post", action="/admin/project/edit/submit")
     div 
-        label(for="projId") Project Id: 
-        input(type="number", id="projId", name="projId" required)
-    div 
         label(for="name") Website Name: 
         input(type="text", id="name", name="web-name" required)
     div 
@@ -22,4 +19,4 @@ block layout-content
     div 
         label(for="imageName") Your Image: 
         input(type="text", id="imageName", name="imageName" placeholder="e.g.myImage.png" required)
-    button(type="submit") Add the Project
+    button(type="submit") Update the Project

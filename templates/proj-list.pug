@@ -1,25 +1,26 @@
 extends layout
 
 block layout-content
-  h1.page-title Administer Directory Projects 
-  a(href="/admin/project/add") + Add new project
-  table 
-    thead 
-      th Image
-      th Project
-      th Author
-      th Operation 
-    tbody 
-      each proj in directory
-        tr 
-          td
-            img(src="/img/" + proj.screen)
-          td #{proj.website_name}
-          td #{proj.Github_username}
-          td
-            form(method="get", action="/admin/project/delete")
-              input(type="hidden", name="projId", value=proj._id)
-              button(type="submit") Delete
-            form(action="/admin/project/edit") 
-              input(type="hidden", name="projId", value=proj._id) 
-              button(type="submit") Edit
+  h1.text-center Administer Directory Projects 
+  div.m-5.text-end
+    a.btn.btn-primary.my-2.w-25(href="/admin/project/add") + Add new project
+    table.table.table-striped.text-center
+      thead.text-content-center 
+        th(style="width: 10rem;") Image
+        th Project
+        th Author
+        th Operation 
+      tbody 
+        each proj in directory
+          tr 
+            td.d-flex.justify-content-center.align-middle
+              img.rounded(src="/img/" + proj.screen)
+            td.align-middle #{proj.website_name}
+            td.align-middle #{proj.Github_username}
+            td.align-middle
+              form(method="get", action="/admin/project/delete")
+                input(type="hidden", name="projId", value=proj._id)
+                button.btn.btn-outline-primary.w-100(type="submit") Delete
+              form(action="/admin/project/edit") 
+                input(type="hidden", name="projId", value=proj._id) 
+                button.btn.btn-outline-primary.w-100.my-2(type="submit") Edit

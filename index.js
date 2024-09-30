@@ -19,7 +19,7 @@ const app = express();
 const port = process.env.PORT || "5214";
 
 app.get("/image.png", (req, res) => {
-  res.sendFile(path.join(__dirname, "./public/img"));
+  res.sendFile(path.join(__dirname, "./public/img/image.png"));
 });
 
 // set up Expess to use pug as a template engine
@@ -61,27 +61,58 @@ app.post("/admin/project/add/submit", async (request, response) => {
   //get data from form (data will be in request)
   //POST form: get data from request.body
   //GET form: get data from request.query
-  //console.log(request.body);
+  console.log(request.body);
   let newProj = {
-    website_name: request.body.web,
-    Github_username: request.body.username,
-    URL: request.body.path,
-    GitHub_repo: request.body.repo,
-    screen: request.file.filename,
-    date_added: new Date(),
+    website_name: request.body.website_name,
+    Github_username: request.body.Github_username,
+    URL: request.body.URL,
+    GitHub_repo: request.body.GitHub_repo,
+    screen: request.body.screen,
+    date_added: new Date()
    /*  number: request.body.projId */
   };
-  await addLink(newProj);
+  await addProj(newProj);
   response.redirect("/admin/project");
 })
 
 app.get("/admin/project/delete", async (request, response) => {
   let id = request.query.projId;
-  await deleteLink(id);
-  response.redirect("/admin/menu");
+  await deleteProj(id);
+  response.redirect("/admin/project");
 })
 
+app.get("/admin/project/edit", async (request, response) => {
+  if (request.query.projId) {
+    let projToEdit = await getSingleProj(request.query.projId);
+    let projects = await getProj();
+    response.render("proj-edit", { title: "Edit project", directory: projects, editProj: projToEdit });
+  }
+  else {
+    response.redirect("/admin/project");
+  }
+});
 
+app.post("/edit/submit", async (request, response) => {
+  //get the _id and set it as a JSON object to be used for the filter
+  let id = request.body.projId; 
+  console.log(id);
+  let idFilter = { _id: new ObjectId(id)};
+  console.log(idFilter);
+  //get detailed form values and build a JSON object containing these (updated) values
+  let project = {
+    website_name: request.body.website_name,
+    Github_username: request.body.Github_username,
+    URL: request.body.URL,
+    GitHub_repo: request.body.GitHub_repo,
+    screen: request.body.screen,
+    date_added: new Date()
+  };
+  //run editLink(idFilter, link) and await the result
+  console.log(idFilter);
+  await editProj(idFilter, project);
+  response.redirect("/admin/project");
+})
+  
 //set up server listening
 app.listen(port, () => {
   console.log(`Listening on http://localhost:${port}`);
@@ -112,6 +143,50 @@ async function getProj() {
     console.error("Error fetching projects: ", error);
     return []; // Return an empty array in case of error
   }
+}
+
+async function addProj(projToAdd) {
+  const db = await connection();
+  await db.collection("directory").insertOne(projToAdd);
+  console.log(`Added ${projToAdd} to drectory`);
+}
+
+async function deleteProj(id) {
+  const db = await connection();
+  let filter = { _id: new ObjectId(id) }; //id is a string, so we need to convert to an ObjectId type
+  let result = await db.collection("directory").deleteOne(filter);
+  //deleteOne() returns an object with a deletedCount property (if successful, this should equal 1)
+  if (result.deletedCount == 1)
+    console.log("The project has successfully been deleted");
+}
+
+async function getSingleProj(id) {
+  const db = await connection();
+  const editId = { _id: new ObjectId(id) };
+  const result = await db.collection("directory").findOne(editId);
+  return result;
+}
+
+async function editProj(filter, project) {
+  db = await connection();
+   const options = { upsert: true };
+  // Specify the update to set a value for the link field
+  let updateProj = {
+    $set: {
+      website_name: project.web,
+      Github_username: project.username,
+      URL: project.path,
+      GitHub_repo: project.repo,
+      screen: project.imageName,
+      date_added: new Date(),
+    }
+};
+  let result = await db.collection("directory").updateOne(filter, updateProj,options);
+  // Print the number of matching and modified documents
+  // https://www.mongodb.com/docs/drivers/node/current/usage-examples/updateOne/#std-label-node-usage-updateone
+  console.log(
+    `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
+  );
 }
 
 export { getProj };

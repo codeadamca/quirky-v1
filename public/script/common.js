@@ -16,14 +16,14 @@ async function loadProjects() {
 window.onload = onLoad;
 async function onLoad() {
     const projects = await loadProjects();
-    //console.log(projects);
+
+    // total projects
+    const totalNum = Object.keys(projects).length;
+    projects.sort((a, b) => new Date(a.date_added) - new Date(b.date_added));
 
     const btnGetOneWeb = document.querySelector(".btnOne");
     const btnGetAllWebs = document.querySelector(".btnAll");
 
-    // total projects
-    const totalNum = Object.keys(projects).length;;
-    console.log(totalNum);
     const projectWrapper = document.querySelector(".project");
     const randomWebWrapper = document.querySelector(".randomWeb");
     const directory = document.querySelector(".directory");
