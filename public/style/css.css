@@ -15,18 +15,6 @@ body {
     height: 100vh;
 }
 
-.directory,
-.randomWeb {
-    display: flex;
-    align-items: center;
-}
-
-
-.randomWeb {
-    flex-direction: column;
-    justify-content: center;
-}
-
 .container-fluid h1 {
     font-family: "Luckiest Guy", cursive;
     font-weight: 400;
@@ -39,27 +27,20 @@ body {
     color: rgba(255, 255, 255, 0.6);
 }
 
-
-.randomWeb {
-    margin-top: 2em;
-    row-gap: 1em;
-}
-
-.directory{
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-}
-
 .card{
     width: 18rem;
     height: 300px;
     margin: 1em;
 }
 
+.rounded{
+    width: 10rem;
+    height: 160px;
+}
+
 figcaption p,
 .randomWeb p {
-    font-family: "Josefin Slab";
+    font-family: Lato;
     font-weight: 400;
     font-style: normal;
     font-size: 2em;

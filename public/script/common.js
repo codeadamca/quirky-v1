@@ -30,22 +30,27 @@ async function onLoad() {
 
     btnGetOneWeb.addEventListener("click", function () {
         console.log("clickGetOne");
+
         projectWrapper.style.display = "flex";
+        if(directory.classList.contains('d-flex')){
+            directory.classList.remove('d-flex', 'flex-row','justify-content-start');
+            directory.classList.add('hide');
+        } 
+
+        randomWebWrapper.classList.remove('hide');
+        randomWebWrapper.classList.add('d-flex', 'justify-content-center');
+
+
         let randomNum = Math.floor(Math.random() * totalNum);
         console.log(randomNum);
+
         let existingImg = randomWebWrapper.querySelector('img');
  /*        let existingP = randomWebWrapper.querySelector('p'); */
         let existingA=randomWebWrapper.querySelector('a');
-         if (directory.classList.contains('hide')) {
-            directory.classList.remove('d-flex');
-        } else {
-            directory.classList.add('hide');
-        } 
-        projectWrapper.style.setProperty('flex', 'none', 'important');
+
         // get from MongoDB   
         if (existingImg) {
             existingImg.src = "/img/" + projects[randomNum].screen;
-            console.log(existingImg.src);
             existingImg.alt = projects[randomNum]._id & projects[randomNum].website_name & projects[randomNum].URL;
             existingA.href = projects[randomNum].URL;
             /*             existingP.textContent = projects[randomNum].Github_username + " | "+projects[randomNum].website_name; */           
@@ -53,6 +58,7 @@ async function onLoad() {
         else {
             const randomWebImg = document.createElement("img");
             randomWebImg.src = "/img/" + projects[randomNum].screen;
+            randomWebImg.classList.add('rounded','m-5');
             randomWebImg.alt = projects[randomNum]._id & projects[randomNum].website_name & projects[randomNum].URL;
             const randomWebLink = document.createElement("a");
             randomWebLink.href = projects[randomNum].URL;
@@ -65,26 +71,22 @@ async function onLoad() {
     });
 
     btnGetAllWebs.addEventListener("click", function () {
-        console.log(projectWrapper);
-        //console.log("clickGetAll");
-        directory.classList.add('d-flex');
-        if (randomWebWrapper.classList.contains('hide')) {
-            console.log("hided randomWebWrapper");
-        } else {
-            randomWebWrapper.classList.add('hide');
-        }
         projectWrapper.style.display = "flex";
+        randomWebWrapper.classList.remove('d-flex');
+        randomWebWrapper.classList.add('hide');
+
         let directoryDisplay = window.getComputedStyle(directory).display;
         if (directoryDisplay === "none") {
-            //btnGetAllWebs.innerHTML = "Hide";
-            directory.style.display = "flex";
-            projectWrapper.style.display = "flex";
-            projectWrapper.scrollIntoView({ behavior: 'smooth' });
-            btnGetAllWebs.innerHTML="Hide All";
+            btnGetAllWebs.innerHTML = "Hide All";
+            directory.classList.remove('hide');
+            directory.classList.add('d-flex', 'flex-row','justify-content-start');        
+            directory.scrollIntoView({ behavior: 'smooth' });
         }
         else {
             /* randomWebWrapper.style.display = "flex"; */
             btnGetAllWebs.innerHTML="Show All";
+            directory.classList.remove('d-flex', 'flex-row','justify-content-start');
+            directory.classList.add('hide'); 
         }
     });
 }
