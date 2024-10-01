@@ -58,7 +58,7 @@ async function onLoad() {
         else {
             const randomWebImg = document.createElement("img");
             randomWebImg.src = "/img/" + projects[randomNum].screen;
-            randomWebImg.classList.add('rounded','m-5');
+            randomWebImg.classList.add('singleImg','m-5','rounded-2');
             randomWebImg.alt = projects[randomNum]._id & projects[randomNum].website_name & projects[randomNum].URL;
             const randomWebLink = document.createElement("a");
             randomWebLink.href = projects[randomNum].URL;

@@ -1,22 +1,24 @@
 extends layout 
 
 block layout-content 
-  h1.page-title Add new project
+  h1.page-title.text-center Add new project
   //- /admin/menu/add/submit will be the location where the form data is submitted to
-  form(method="post", action="/admin/project/add/submit")
-    div 
-        label(for="name") Website Name: 
-        input(type="text", id="name", name="website_name" required)
-    div 
-        label(for="user") User Name: 
-        input(type="text", id="user", name="Github_username" placeholder="your github username" required)
-    div 
-        label(for="href") URI: 
-        input(type="text", id="href", name="URL", placeholder="e.g. /my-project-page-uri" required)
-    div 
-        label(for="repo") Repo: 
-        input(type="text", id="repo", name="GitHub_repo", placeholder="e.g. https://github.com/useless-web" required)
-    div 
-        label(for="imageName") Your Image: 
-        input(type="text", id="imageName", name="screen",placeholder="e.g. image,png" required)
-    button(type="submit") Add the Project
+  div.d-flex.justify-content-center.align-items-center.flex-column.m-2.p-2
+    form.d-flex.justify-content-center.align-item-center.flex-column.text-start.border.border-primary.p-5.bg-primary.text-white.rounded-2.col-4(method="post", action="/admin/project/add/submit" )
+        div.mb-3 
+            label.form-label(for="name") Website Name: 
+            input.form-control(type="text", id="name", name="website_name" placeholder="your website username" required)
+        div.mb-3 
+            label.form-label(for="user") User Name: 
+            input.form-control(type="text", id="user", name="Github_username" placeholder="your github username" required)
+        div.mb-3 
+            label.form-label(for="href") URL: 
+            input.form-control(type="text", id="href", name="URL", placeholder="e.g. http://my-project-page-uri" required)
+        div.mb-3
+            label.form-label(for="repo") Repo: 
+            input.form-control(type="text", id="repo", name="GitHub_repo", placeholder="e.g. https://github.com/useless-web" required)
+        div.mb-4
+            label.form-label(for="imageName") Your Image: 
+            input.form-control(type="text", id="imageName", name="screen",placeholder="e.g. image,png" required)
+        button.btn.btn-dark.mb-2(type="submit") Add the Project
+        a.btn.btn-dark(href="/admin/project") Cancel

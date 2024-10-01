@@ -2,15 +2,15 @@ extends layout
 
 block layout-content
   h1.text-center Administer Directory Projects 
-  div.m-5.text-end
-    a.btn.btn-primary.my-2.w-25(href="/admin/project/add") + Add new project
+  div.m-3.text-end
+    a.btn.btn-primary.my-3(href="/admin/project/add",style="width: 28rem;") + Add new project
     table.table.table-striped.text-center
-      thead.text-content-center 
+      thead.text-content-center.fs-3.table-dark
         th(style="width: 10rem;") Image
         th Project
         th Author
         th Operation 
-      tbody 
+      tbody.fs-4 
         each proj in directory
           tr 
             td.d-flex.justify-content-center.align-middle

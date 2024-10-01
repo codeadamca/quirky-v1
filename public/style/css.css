@@ -38,6 +38,15 @@ body {
     height: 160px;
 }
 
+.singleImg{
+    width: 13rem;
+    height: 200px;
+}
+
+.card-img-top:hover{
+    border: 1px solid black;
+}
+
 figcaption p,
 .randomWeb p {
     font-family: Lato;

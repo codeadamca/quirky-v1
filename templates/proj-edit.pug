@@ -1,22 +1,25 @@
 extends layout 
 
 block layout-content 
-  h1.page-title Edit new project
+  h1.page-title.text-center Edit new project
   //- /admin/menu/add/submit will be the location where the form data is submitted to
-  form(method="post", action="/admin/project/edit/submit")
-    div 
-        label(for="name") Website Name: 
-        input(type="text", id="name", name="web-name" required)
-    div 
-        label(for="user") User Name: 
-        input(type="text", id="user", name="username" placeholder="your github username" required)
-    div 
-        label(for="href") URI: 
-        input(type="text", id="href", name="path", placeholder="e.g. /my-project-page-uri" required)
-    div 
-        label(for="repo") Repo: 
-        input(type="text", id="repo", name="repo", placeholder="e.g. https://github.com/useless-web" required)
-    div 
-        label(for="imageName") Your Image: 
-        input(type="text", id="imageName", name="imageName" placeholder="e.g.myImage.png" required)
-    button(type="submit") Update the Project
+  div.d-flex.justify-content-center.align-items-center.flex-column.m-2.p-2
+    form.d-flex.justify-content-center.align-item-center.flex-column.text-start.border.border-dark.p-5.bg-dark.text-white.rounded-2.col-4(method="post", action="/admin/project/edit/submit")
+        input(type="hidden", name="projId", value=editProj._id)
+        div.mb-3 
+            label.form-label(for="name") Website Name: 
+            input.form-control(type="text", id="name", name="website_name" value=editProj.website_name)
+        div.mb-3
+            label.form-label(for="user") User Name: 
+            input.form-control(type="text", id="user", name="Github_username" value=editProj.Github_username)
+        div.mb-3 
+            label.form-label(for="href") URI: 
+            input.form-control(type="text", id="href", name="URL", value=editProj.URL)
+        div.mb-3 
+            label.form-label(for="repo") Repo: 
+            input.form-control(type="text", id="repo", name="GitHub_repo", value=editProj.GitHub_repo)
+        div.mb-4 
+            label.form-label(for="imageName") Your Image: 
+            input.form-control(type="text", id="imageName", name="screen" value=editProj.screen)
+        button.btn.btn-primary.mb-2(type="submit") Update the Project
+        a.btn.btn-primary(href="/admin/project") Cancel

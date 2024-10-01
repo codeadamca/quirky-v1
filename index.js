@@ -92,7 +92,7 @@ app.get("/admin/project/edit", async (request, response) => {
   }
 });
 
-app.post("/edit/submit", async (request, response) => {
+app.post("/admin/project/edit/submit", async (request, response) => {
   //get the _id and set it as a JSON object to be used for the filter
   let id = request.body.projId; 
   console.log(id);
@@ -168,16 +168,16 @@ async function getSingleProj(id) {
 }
 
 async function editProj(filter, project) {
-  db = await connection();
+  const db = await connection();
    const options = { upsert: true };
   // Specify the update to set a value for the link field
   let updateProj = {
     $set: {
-      website_name: project.web,
-      Github_username: project.username,
-      URL: project.path,
-      GitHub_repo: project.repo,
-      screen: project.imageName,
+      website_name: project.website_name,
+      Github_username: project.Github_username,
+      URL: project.URL,
+      GitHub_repo: project.GitHub_repo,
+      screen: project.screen,
       date_added: new Date(),
     }
 };

@@ -19,7 +19,7 @@ block layout-content
     div.project      
         div.directory.d-flex.p-4
             each project in directory
-                figure.card.d-flex.p-2
+                figure.card.d-flex.p-2.justify-content-between
                     a(href=project.URL) 
                         img.card-img-top(src="/img/" + project.screen)
                     figcaption.figure-caption.text-center
