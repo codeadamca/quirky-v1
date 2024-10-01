@@ -4,6 +4,7 @@
   "description": "This is a web directory for HTTP5214",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon ./index.js"
   },
   "author": "Flora",
