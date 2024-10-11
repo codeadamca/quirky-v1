@@ -4,7 +4,7 @@ block layout-content
   h1.page-title.text-center Edit new project
   //- /admin/menu/add/submit will be the location where the form data is submitted to
   div.d-flex.justify-content-center.align-items-center.flex-column.m-2.p-2
-    form.d-flex.justify-content-center.align-item-center.flex-column.text-start.border.border-dark.p-5.bg-dark.text-white.rounded-2.col-4(method="post", action="/admin/project/edit/submit")
+    form.d-flex.justify-content-center.align-item-center.flex-column.text-start.border.border-dark.p-5.bg-dark.text-white.rounded-2.col-4(method="post", action="/admin/project/edit/submit",enctype="multipart/form-data")
         input(type="hidden", name="projId", value=editProj._id)
         div.mb-3 
             label.form-label(for="name") Website Name: 
@@ -19,7 +19,12 @@ block layout-content
             label.form-label(for="repo") Repo: 
             input.form-control(type="text", id="repo", name="GitHub_repo", value=editProj.GitHub_repo)
         div.mb-4 
-            label.form-label(for="imageName") Your Image: 
-            input.form-control(type="text", id="imageName", name="screen" value=editProj.screen)
+            label.form-label(for="imageName") Upload Project Page: 
+            if editProj.screen
+            img(src="/img/"+editProj.screen, id="preview",alt="Current Screen", style="max-width: 100%; height: auto;")
+            input.form-control(type="file", id="imageName", name="screen")
         button.btn.btn-primary.mb-2(type="submit") Update the Project
         a.btn.btn-primary(href="/admin/project") Cancel
+
+block scripts
+    script(type="module" src="/script/img-preview.js")

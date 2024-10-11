@@ -1,6 +1,8 @@
 import express from "express";
 import path from "path";
 import * as url from 'url';
+import multer from "multer";
+import fs from "fs";
 
 import { MongoClient, ObjectId } from "mongodb";
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -18,9 +20,17 @@ const path = require("path"); */
 const app = express();
 const port = process.env.PORT || "5214";
 
-app.get("/image.png", (req, res) => {
-  res.sendFile(path.join(__dirname, "./public/img/image.png"));
-});
+var storage = multer.diskStorage({
+  destination: function (request, file, cb) {
+    cb(null, 'public/img')
+  },
+  filename: function (request, file, cb) {
+    cb(null, file.originalname)
+  }
+})
+var upload = multer({ storage: storage })
+
+app.use(express.static('public/img'));
 
 // set up Expess to use pug as a template engine
 app.set("views", path.join(__dirname, "templates"));
@@ -57,7 +67,7 @@ app.get("/admin/project/add", async (request, response) => {
   response.render("proj-add", { title: "Add a Project", directory: projects });
 })
 
-app.post("/admin/project/add/submit", async (request, response) => {
+app.post("/admin/project/add/submit", upload.single('screen'),async (request, response) => {
   //get data from form (data will be in request)
   //POST form: get data from request.body
   //GET form: get data from request.query
@@ -67,7 +77,7 @@ app.post("/admin/project/add/submit", async (request, response) => {
     Github_username: request.body.Github_username,
     URL: request.body.URL,
     GitHub_repo: request.body.GitHub_repo,
-    screen: request.body.screen,
+    screen: request.file.filename,
     date_added: new Date()
    /*  number: request.body.projId */
   };
@@ -92,19 +102,21 @@ app.get("/admin/project/edit", async (request, response) => {
   }
 });
 
-app.post("/admin/project/edit/submit", async (request, response) => {
+app.post("/admin/project/edit/submit", upload.single('screen'),async (request, response) => {
   //get the _id and set it as a JSON object to be used for the filter
   let id = request.body.projId; 
   console.log(id);
   let idFilter = { _id: new ObjectId(id)};
   console.log(idFilter);
   //get detailed form values and build a JSON object containing these (updated) values
+
+  let editScreen = request.file ? request.file.filename : request.body.screen;
   let project = {
     website_name: request.body.website_name,
     Github_username: request.body.Github_username,
     URL: request.body.URL,
     GitHub_repo: request.body.GitHub_repo,
-    screen: request.body.screen,
+    screen: editScreen,
     date_added: new Date()
   };
   //run editLink(idFilter, link) and await the result
