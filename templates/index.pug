@@ -1,0 +1,30 @@
+extends layout
+
+block layout-content
+    //-header#header
+    //-class
+    div.home.container-fluid.bg-dark.d-flex.justify-content-center.align-items-center.flex-column
+        div.container-fluid.text-center
+            h1 TAKE ME
+            h1.small TO A
+            h1 POINTLESS WEBSITE
+            p This directory is used to store all the useless websites in Workshops in Web Dev 2 course.
+        div.container-fluid.text-center
+            button.btnOne.btn.btn-outline-primary Get One
+            button.btnAll.btn.btn-outline-primary.ms-2 Show All
+        div.oneProj
+            div.randomWeb.p-2
+                //- img(src="/img/placeholder.png")
+                //- p.title author1 | website name1
+    div.project      
+        div.directory.d-flex.p-4
+            each project in directory
+                figure.card.d-flex.p-2.justify-content-between
+                    a(href=project.URL) 
+                        img.card-img-top(src="/img/" + project.screen)
+                    figcaption.figure-caption.text-center
+                        p #{project.Github_username} | #{project.website_name}
+                        a(href=project.GitHub_repo)
+                            p.btn.btn-dark Go to GitHub Repo
+block scripts
+    script(type="module" src="/script/common.js")
