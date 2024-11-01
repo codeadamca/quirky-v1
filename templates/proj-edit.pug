@@ -6,6 +6,7 @@ block layout-content
   div.d-flex.justify-content-center.align-items-center.flex-column.m-2.p-2
     form.d-flex.justify-content-center.align-item-center.flex-column.text-start.p-5.bg-dark-subtle.text-dark.rounded-2.col-6(method="post", action="/admin/project/edit/submit",enctype="multipart/form-data")
         input(type="hidden", name="projId", value=editProj._id)
+        input(type="hidden", name="currentScreen", value=editProj.screen)
         div.mb-3 
             label.form-label(for="name") Website Name: 
             input.form-control(type="text", id="name", name="website_name" value=editProj.website_name)

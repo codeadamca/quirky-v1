@@ -189,10 +189,12 @@ async function editProj(filter, project) {
       Github_username: project.Github_username,
       URL: project.URL,
       GitHub_repo: project.GitHub_repo,
-      screen: project.screen,
       date_added: new Date(),
     }
 };
+if (project.screen) {
+  updateProj.$set.screen = project.screen;
+}
   let result = await db.collection("directory").updateOne(filter, updateProj,options);
   // Print the number of matching and modified documents
   // https://www.mongodb.com/docs/drivers/node/current/usage-examples/updateOne/#std-label-node-usage-updateone
