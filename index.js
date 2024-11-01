@@ -2,10 +2,10 @@ import express from "express";
 import path from "path";
 import * as url from 'url';
 import multer from "multer";
-import fs from "fs";
+//import fs from "fs";
 
 import { MongoClient, ObjectId } from "mongodb";
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+const _dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 
 //MONGODB CLIENT SETUP
@@ -33,11 +33,11 @@ var upload = multer({ storage: storage })
 app.use(express.static('public/img'));
 
 // set up Expess to use pug as a template engine
-app.set("views", path.join(__dirname, "templates"));
+app.set("views", path.join(_dirname, "templates"));
 app.set("view engine", "pug");
 
 // set up a folder path for static files (css, client-side js, image files)
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(_dirname, "public")));
 
 //CONVERT URLENCODED FORMAT (FOR GET/POST REQUESTS) TO JSON
 //UrlEncoded format is query string format (e.g. parameter1=value1&parameter2=value2)

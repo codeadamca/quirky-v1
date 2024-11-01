@@ -4,16 +4,9 @@ async function loadProjects() {
     console.log("Loaded projects:", projects);
     return projects;
 }
-// // {
-// //     _id: new ObjectId('66ed95857b5a5965c2e00625'),
-// //     website_name: 'useless website3',
-// //     Github_username: 'Drashti',
-// //     URL: 'http://www.google.com',
-// //     GitHub_repo: 'https://github.com/codeadamca/http5114',
-// //     screen: 'image3.png',
-// //     date_added: 2024-09-22T09:08:00.000Z
-// //   }
+
 window.onload = onLoad;
+
 async function onLoad() {
     const projects = await loadProjects();
 
@@ -30,12 +23,16 @@ async function onLoad() {
 
     btnGetOneWeb.addEventListener("click", function () {
         console.log("clickGetOne");
-
-        projectWrapper.style.display = "flex";
-        if(directory.classList.contains('d-flex')){
-            directory.classList.remove('d-flex', 'flex-row','justify-content-start');
-            directory.classList.add('hide');
-        } 
+0
+        if(projectWrapper.classList.contains('d-flex'));
+        {
+            projectWrapper.classList.add('hide');
+        }
+        // projectWrapper.style.display = "flex";
+        // if(directory.classList.contains('d-flex')){
+        //     directory.classList.remove('d-flex', 'flex-row','justify-content-start');
+        //     directory.classList.add('hide');
+        // } 
 
         randomWebWrapper.classList.remove('hide');
         randomWebWrapper.classList.add('d-flex', 'justify-content-center');
@@ -71,23 +68,26 @@ async function onLoad() {
     });
 
     btnGetAllWebs.addEventListener("click", function () {
-        projectWrapper.style.display = "flex";
         randomWebWrapper.classList.remove('d-flex');
         randomWebWrapper.classList.add('hide');
-
-        let directoryDisplay = window.getComputedStyle(directory).display;
-        if (directoryDisplay === "none") {
-            btnGetAllWebs.innerHTML = "Hide All";
-            directory.classList.remove('hide');
-            directory.classList.add('d-flex', 'flex-row','justify-content-start');        
+        
+        if(btnGetAllWebs.innerHTML==="Show All"){
+            projectWrapper.classList.remove('hide');
+            projectWrapper.classList.add("display");
             directory.scrollIntoView({ behavior: 'smooth' });
+            btnGetAllWebs.innerHTML="Hide All";
         }
+                
         else {
+            console.log("now it's HIDE ALL");
             /* randomWebWrapper.style.display = "flex"; */
+            projectWrapper.classList.remove('display');
+            projectWrapper.classList.add('hide');
             btnGetAllWebs.innerHTML="Show All";
-            directory.classList.remove('d-flex', 'flex-row','justify-content-start');
-            directory.classList.add('hide'); 
+            // directory.classList.remove('d-flex', 'flex-row','justify-content-start');
+            // directory.classList.add('hide'); 
         }
     });
 
 }
+

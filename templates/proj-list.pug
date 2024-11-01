@@ -18,9 +18,12 @@ block layout-content
             td.align-middle #{proj.website_name}
             td.align-middle #{proj.Github_username}
             td.align-middle
-              form(method="get", action="/admin/project/delete")
+              form(method="get", action="deleteConfirm")
                 input(type="hidden", name="projId", value=proj._id)
-                button.btn.btn-outline-primary.w-100(type="submit") Delete
+                button.btn.btn-outline-primary.w-100(type="button" onclick=`confirmDelete('${proj._id}')`) Delete
               form(action="/admin/project/edit") 
                 input(type="hidden", name="projId", value=proj._id) 
                 button.btn.btn-outline-primary.w-100.my-2(type="submit") Edit
+
+block scripts
+  script(src="/script/confirmDelete.js")

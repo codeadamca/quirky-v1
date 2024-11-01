@@ -16,15 +16,15 @@ block layout-content
             div.randomWeb.p-2
                 //- img(src="/img/placeholder.png")
                 //- p.title author1 | website name1
-    div.project      
-        div.directory.d-flex.p-4
+    div.project.container.justify-content-center
+        div.directory.row.justify-content-start.mt-3
             each project in directory
-                figure.card.d-flex.p-2.justify-content-between
-                    a(href=project.URL) 
-                        img.card-img-top(src="/img/" + project.screen)
-                    figcaption.figure-caption.text-center
-                        p #{project.Github_username} | #{project.website_name}
-                        a(href=project.GitHub_repo)
-                            p.btn.btn-dark Go to GitHub Repo
+                .col-sm-3.p-3
+                    figure.card.mb-3.d-flex.justify-content-center(style="height:18rem;")
+                        a(href=project.URL).ratio.ratio-4x3 
+                            img.card-img-top(src="/img/" + project.screen style="object-fit:cover;" alt="This is "+project.Github_username+"'s project: "+project.website_name+". Github repo: "+project.GitHub_repo)
+                        figcaption.card-body.text-center.d-flex.flex-column.justify-content-between
+                            p.card-title #{project.Github_username} | #{project.website_name}
+                            a(href=project.GitHub_repo).btn.btn-dark Go to GitHub Repo
 block scripts
     script(type="module" src="/script/common.js")
