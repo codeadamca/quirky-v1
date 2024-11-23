@@ -2,8 +2,6 @@ nav.navbar.navbar-expand-lg.bg-dark
     .container-fluid.d-flex.flex-row
         if (!(title&&title==="Home"))
             a.navbar-brand.text-light(href='#') Pointless Dictionary
-        button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNavAltMarkup', aria-controls='navbarNavAltMarkup', aria-expanded='false', aria-label='Toggle navigation')
-            span.text-light.navbar-toggler-icon
         #navbarNavAltMarkup.collapse.navbar-collapse
         .navbar-nav.d-flex.flex-row(style="--bs-nav-link-padding-y: 0rem;")
             if (!(title&&title==="Home"))
@@ -15,4 +13,6 @@ nav.navbar.navbar-expand-lg.bg-dark
                 a.nav-link.text-light(href='/logout') Logout
                 a.nav-link.text-light(href='/admin/project') Project
             if (userSession&&userSession.role==="admin")
-                a.nav-link.text-light(href='/admin/user') User
+                a.me-3.nav-link.text-light(href='/admin/user') User
+            if userSession                
+                .text-center.my-auto.fw-bolder.text-white Hello #{userSession.username}
