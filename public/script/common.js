@@ -28,15 +28,9 @@ async function onLoad() {
         {
             projectWrapper.classList.add('hide');
         }
-        // projectWrapper.style.display = "flex";
-        // if(directory.classList.contains('d-flex')){
-        //     directory.classList.remove('d-flex', 'flex-row','justify-content-start');
-        //     directory.classList.add('hide');
-        // } 
 
         randomWebWrapper.classList.remove('hide');
         randomWebWrapper.classList.add('d-flex', 'justify-content-center');
-
 
         let randomNum = Math.floor(Math.random() * totalNum);
         console.log(randomNum);
@@ -90,4 +84,6 @@ async function onLoad() {
     });
 
 }
+
+
 

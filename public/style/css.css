@@ -30,12 +30,15 @@ body {
 
 .rounded{
     width: 10rem;
-    height: 160px;
+    height: 164.62px;
+    object-fit: cover; 
 }
+
 
 .singleImg{
     width: 13rem;
-    height: 200px;
+    height: 12.5rem;
+    object-fit: cover;
 }
 
 .card-img-top:hover{
@@ -71,3 +74,5 @@ figcaption p,
 .display{
     display:flex;
 }
+
+

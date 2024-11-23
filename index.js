@@ -3,28 +3,32 @@ import path from "path";
 import * as url from 'url';
 import multer from "multer";
 //import fs from "fs";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import flash from "connect-flash";
+import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from 'uuid';
+import users from './public/module/users.js'; 
+import projects from './public/module/projects.js'; 
+import dotenv from "dotenv";
+dotenv.config();
 
 import { MongoClient, ObjectId } from "mongodb";
 const _dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-
 //MONGODB CLIENT SETUP
-const dbUrl = "mongodb+srv://testdbuser:KqqIRLt1aZyFBY5X@cluster0.sckq1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; //connection string for MongoDB (use 127.0.0.1 instead of "localhost" especially for Mac)
-const client = new MongoClient(dbUrl); //create a new client by passing in the connection string
-// Database Name
-const dbName = 'HTTP5124';
-//import required modules
-/* const express = require("express");
-const path = require("path"); */
-//set up Express object and port
+const dbUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PWD}@${process.env.DB_ATLAS}`;
+
+// const dbUrl = "mongodb+srv://testdbuser:KqqIRLt1aZyFBY5X@cluster0.sckq1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; 
+const client = new MongoClient(dbUrl); 
 const app = express();
 const port = process.env.PORT || "5214";
 
 var storage = multer.diskStorage({
-  destination: function (request, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, 'public/img')
   },
-  filename: function (request, file, cb) {
+  filename: function (req, file, cb) {
     cb(null, file.originalname)
   }
 })
@@ -36,173 +40,347 @@ app.use(express.static('public/img'));
 app.set("views", path.join(_dirname, "templates"));
 app.set("view engine", "pug");
 
-// set up a folder path for static files (css, client-side js, image files)
-app.use(express.static(path.join(_dirname, "public")));
-
-//CONVERT URLENCODED FORMAT (FOR GET/POST REQUESTS) TO JSON
-//UrlEncoded format is query string format (e.g. parameter1=value1&parameter2=value2)
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json()); //use JSON
+app.use(express.static(path.join(_dirname, "public")));
+app.use(express.json());
+app.use(flash());
 
-app.get("/api/projects", async (request, response) => {
-  let projects = await getProj();
-  response.json(projects); 
+const oneDay = 1000 * 60 * 60 * 24;
+app.use(cookieParser());
+app.use(
+  session({
+    secret: `${process.env.SESSION_SECRET}`,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: oneDay },
+    resave: false,
+  }));
+
+app.use((req, res, next) => {
+  app.locals.userSession = req.session.user || null; 
+  console.log("Current user session: ", req.session.user); 
+  next();
+});
+
+app.get("/login", async (req, res) => {
+  try {
+    const error = req.flash("error");
+    let userList = await users.getUsers();
+    // console.log(userList);
+    if (!userList.length) {
+      await users.initializeUsers();
+      userList = await users.getUsers();
+    }
+    res.render("login", { title: "Login", messages: { error } });
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    req.flash("error", "An error occurred while fetching users.");
+    res.redirect("/login");
+  }
+});
+
+app.post("/login/submit", async (req, res) => {
+  const { email, password } = req.body;
+  let userResult = await users.findOneByemail(email);
+  console.log("login submit");
+  if (userResult) {
+    const verifyValue = await users.verifyPassword(password, userResult.password);
+    if (verifyValue) {
+      const sessionId = uuidv4();
+      userResult.sessionId = sessionId;
+      await userResult.save();
+      res.cookie("sessionId", sessionId, { maxAge: oneDay, httpOnly: true });
+      req.session.user = {
+        userId: userResult._id, 
+        username: userResult.username,
+        role: userResult.role,
+        email: userResult.email,
+      };     
+      // console.log("Session after login: ", req.session.user); 
+      if(req.session.user.role)
+      return res.redirect("/admin/project");
+    } else {
+      req.flash("error", "Password incorrect");
+      return res.redirect("/login");
+    }
+  } else {
+    req.flash("error", "No user with that email");
+    return res.redirect("/login");
+  }
+});
+
+app.get("/logout", (req, res) => {
+  req.session.destroy();
+  res.redirect("/login");
+});
+
+app.get("/register", async (req, res) => {
+  const error = req.session.error || null;
+  req.session.error = null;
+  res.render("register", {
+    title: "Create a New Account",
+    messages: { error },
+  });
+});
+
+app.post("/register", async (req, res) => {
+  const error = req.session.error || null;
+  req.session.error = null;
+  const { name, email, password } = req.body;
+  let userResult = await users.findOneByemail(email);
+  if (userResult) {
+    return res.render("register", {
+      title: "Create a New Account",
+      messages: { error: "Email already in use. Please sign in." },
+    });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.render("register", {
+      title: "Create a New Account",
+      messages: { error: "Email invalid." },
+    });
+  }
+  await users.addUser(name, email, password);
+  res.redirect("/login");
+});
+
+app.get("/api/projects", async (req, res) => {
+  let projList = await projects.getProj();
+  res.json(projList); 
 });
 
 //http://localhost:5214
-app.get("/", async (request, response) => {
-  // renders templates/layout.pug
-  let projects = await getProj();
-  console.log("Projects to render:", projects);
-  response.render("index", { title: "Home", directory: projects });
+app.get("/", async (req, res) => {
+  let userSession=req.session.user || null;
+  console.log(userSession);
+  let projList = await projects.getProj();
+  if (!projList.length&&(userSession)) {
+    const initializeProj= await projects.initializeProjects(userSession.userId);
+    console.log(initializeProj);
+    projList = await projects.getProj();
+  }
+  console.log("Projects to render:", projList);
+  res.render("index", { title: "Home", directory: projList, userSession: req.session.user || null });
 });
 
-app.get("/admin/project", async (request, response) => {
-  let projects = await getProj();
-  response.render("proj-list", { title: "Administer Directory", directory: projects });
+// ADMIN - Project
+app.get("/admin/project", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  let projList = await projects.getProj();
+  console.log("admin",req.session.user);
+  if (!projList.length) {
+    await projects.initializeProjects(req.session.user.userId);
+    projList = await projects.getProj();
+  }
+  console.log("initialprojects:",projList);
+  console.log("users",req.session.user);
+  let title = "Administer Directory Projects";
+  if(req.session.user.role==="user"){  
+    projList = await projects.getUserProj(req.session.user.userId);
+    title = "My Projects";
+  }
+  const formatProjList = projList.map((proj) => {
+    proj.createdDateFormatted = new Date(proj.date_added)
+      .toISOString()
+      .split("T")[0];
+    return proj;
+  });
+  console.log(projList);
+  res.render("proj-list", { title: title, directory: formatProjList, userSession: req.session.user || null });
+});
+
+app.get("/admin/project/add", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  let projList = await projects.getProj();
+  if (!projList.length) {
+    await projects.initializeProjects(req.session.user.id);
+    projList = await projects.getProj();
+  }
+  res.render("proj-add", { title: "Add New Project", directory: projList, userSession: req.session.user || null});
 })
 
-app.get("/admin/project/add", async (request, response) => {
-  let projects = await getProj();
-  response.render("proj-add", { title: "Add a Project", directory: projects });
-})
-
-app.post("/admin/project/add/submit", upload.single('screen'),async (request, response) => {
-  //get data from form (data will be in request)
-  //POST form: get data from request.body
-  //GET form: get data from request.query
-  console.log(request.body);
+app.post("/admin/project/add/submit", upload.single('screen'),async (req, res) => {
+  console.log("form",req.body);
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
   let newProj = {
-    website_name: request.body.website_name,
-    Github_username: request.body.Github_username,
-    URL: request.body.URL,
-    GitHub_repo: request.body.GitHub_repo,
-    screen: request.file.filename,
-    date_added: new Date()
-   /*  number: request.body.projId */
+    website_name: req.body.website_name,
+    Github_username: req.body.Github_username,
+    URL: req.body.URL,
+    GitHub_repo: req.body.GitHub_repo,
+    screen: req.file.filename,
+    date_added: new Date(),
+    createdBy:req.session.user.userId,
+   /*  number: req.body.projId */
   };
-  await addProj(newProj);
-  response.redirect("/admin/project");
+  await projects.addProj(newProj);
+  res.redirect("/admin/project");
 })
 
-app.get("/admin/project/delete", async (request, response) => {
-  let id = request.query.projId;
-  await deleteProj(id);
-  response.redirect("/admin/project");
+app.get("/admin/project/delete", async (req, res) => {
+  let id = req.query.projId;
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  await projects.deleteProj(id);
+  res.redirect("/admin/project");
 })
 
-app.get("/admin/project/edit", async (request, response) => {
-  if (request.query.projId) {
-    let projToEdit = await getSingleProj(request.query.projId);
-    let projects = await getProj();
-    response.render("proj-edit", { title: "Edit project", directory: projects, editProj: projToEdit });
+app.get("/admin/project/edit", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  if (req.query.projId) {
+    let projToEdit = await projects.getSingleProj(req.query.projId);
+    let projList = await projects.getProj();
+    res.render("proj-edit", { title: "Edit the Project", directory: projList, editProj: projToEdit, userSession: req.session.user || null });
   }
   else {
-    response.redirect("/admin/project");
+    res.redirect("/admin/project");
   }
 });
 
-app.post("/admin/project/edit/submit", upload.single('screen'),async (request, response) => {
-  //get the _id and set it as a JSON object to be used for the filter
-  let id = request.body.projId; 
+app.post("/admin/project/edit/submit", upload.single('screen'),async (req, res) => { 
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }let id = req.body.projId; 
   console.log(id);
   let idFilter = { _id: new ObjectId(id)};
   console.log(idFilter);
   //get detailed form values and build a JSON object containing these (updated) values
-
-  let editScreen = request.file ? request.file.filename : request.body.screen;
+  let editScreen = req.file ? req.file.filename : req.body.screen;
   let project = {
-    website_name: request.body.website_name,
-    Github_username: request.body.Github_username,
-    URL: request.body.URL,
-    GitHub_repo: request.body.GitHub_repo,
+    website_name: req.body.website_name,
+    Github_username: req.body.Github_username,
+    URL: req.body.URL,
+    GitHub_repo: req.body.GitHub_repo,
     screen: editScreen,
-    date_added: new Date()
+    // date_added: new Date(),
+    // createdBy:req.session.user.userId
   };
   //run editLink(idFilter, link) and await the result
   console.log(idFilter);
-  await editProj(idFilter, project);
-  response.redirect("/admin/project");
+  await projects.editProj(idFilter, project);
+  res.redirect("/admin/project");
 })
-  
+ 
+// ADMIN - User
+app.get("/admin/user", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  let userList = await users.getUsers();
+  if (!userList.length) {
+    await users.initializeUsers();
+    userList = await users.getUsers();
+  }
+  const formatUserList = userList.map((user) => {
+    user.createdDateFormatted = new Date(user.createdDate)
+      .toISOString()
+      .split("T")[0];
+    return user;
+  });
+  console.log(req.session.user);
+  res.render("user-list", { title: "Students in HTTP5214", students: formatUserList, userSession: req.session.user || null });
+});
+
+app.get("/admin/user/add", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  let userList = await users.getUsers();
+  if (!userList.length) {
+    await users.initializeUsers();
+    userList = await users.getUsers();
+  }
+  res.render("user-add", { title: "Create a New Account", students: userList, userSession: req.session.user || null});
+})
+
+app.post("/admin/user/add/submit", async (req, res) => {  
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  const { username, email, password, role } = req.body;
+  let userResult = await users.findOneByemail(email);
+  if (userResult) {
+    return render("user-add", {
+      title: "Create a New Account",
+      messages: { error: "Email already in use." },
+    });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.render("user-add", {
+      title: "Create a New Account",
+      messages: { error: "Email invalid." },
+    });
+  }
+  await users.addUserAdmin(username, email, password, role);
+  res.redirect("/admin/user"); 
+})
+
+app.get("/admin/user/delete", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  let id = req.query.userId;
+  await users.deleteUser(id);
+  res.redirect("/admin/user");
+})
+
+app.get("/admin/user/edit", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+    let userToEdit = await users.findOneById(req.query.userId);
+    let userList = await users.getUsers();
+    res.render("user-edit", { title: "Edit User", students: userList, editUser: userToEdit, userSession: req.session.user || null });
+  });
+
+app.post("/admin/user/edit/submit", async (req, res) => {
+  console.log("Session Data:", req.session.user);
+  if (!req.session.user) {
+    return res.redirect("/login"); 
+  }
+  let id = req.body.userId; 
+  console.log(id);
+  let idFilter = { _id: new ObjectId(id)};
+
+  let updatedUser = {
+    username: req.body.username,
+    email: req.body.email,
+    role: req.body.role,
+    password: req.body.password,
+    date_added: new Date()
+  };
+
+  console.log(idFilter,updatedUser);
+  await users.updateUser(idFilter, updatedUser);
+  res.redirect("/admin/user");
+})
+
+
+
 //set up server listening
 app.listen(port, () => {
   console.log(`Listening on http://localhost:${port}`);
 });
 
-
-// MongoDB Functions
-async function connection() {
-  try {
-    await client.connect(); // Connect to MongoDB
-    console.log("Connected successfully to MongoDB server");
-    const db = client.db(dbName); // Select the database
-    return db; // Return the database object
-  } catch (error) {
-    console.error("Error connecting to MongoDB: ", error);
-    throw error;
-  }
-}
-
-async function getProj() {
-  try {
-    const db = await connection(); // Use await because connection() is asynchronous
-    let results = db.collection("directory").find({}).sort({ date_added: 1 }); // Find all entries and sort by date_added
-    let projects = await results.toArray(); // Convert FindCursor to an array
-    console.log("Projects fetched: ", projects); // Log the actual array of documents
-    return projects; // Return the array of project data
-  } catch (error) {
-    console.error("Error fetching projects: ", error);
-    return []; // Return an empty array in case of error
-  }
-}
-
-async function addProj(projToAdd) {
-  const db = await connection();
-  await db.collection("directory").insertOne(projToAdd);
-  console.log(`Added ${projToAdd} to drectory`);
-}
-
-async function deleteProj(id) {
-  const db = await connection();
-  let filter = { _id: new ObjectId(id) }; //id is a string, so we need to convert to an ObjectId type
-  let result = await db.collection("directory").deleteOne(filter);
-  //deleteOne() returns an object with a deletedCount property (if successful, this should equal 1)
-  if (result.deletedCount == 1)
-    console.log("The project has successfully been deleted");
-}
-
-async function getSingleProj(id) {
-  const db = await connection();
-  const editId = { _id: new ObjectId(id) };
-  const result = await db.collection("directory").findOne(editId);
-  return result;
-}
-
-async function editProj(filter, project) {
-  const db = await connection();
-   const options = { upsert: true };
-  // Specify the update to set a value for the link field
-  let updateProj = {
-    $set: {
-      website_name: project.website_name,
-      Github_username: project.Github_username,
-      URL: project.URL,
-      GitHub_repo: project.GitHub_repo,
-      date_added: new Date(),
-    }
-};
-if (project.screen) {
-  updateProj.$set.screen = project.screen;
-}
-  let result = await db.collection("directory").updateOne(filter, updateProj,options);
-  // Print the number of matching and modified documents
-  // https://www.mongodb.com/docs/drivers/node/current/usage-examples/updateOne/#std-label-node-usage-updateone
-  console.log(
-    `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`,
-  );
-}
-
-export { getProj };
 
 

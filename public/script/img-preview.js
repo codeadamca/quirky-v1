@@ -15,7 +15,6 @@ imgName.addEventListener('change', function(event) {
       reader.readAsDataURL(file); 
     }
     else{
-      else {
         imgPreview.src = imgPreview.src || '/img/placeholder.png'; 
         imgPreview.style.display = "block";
     }

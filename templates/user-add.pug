@@ -1,0 +1,17 @@
+extends layout 
+
+block layout-content 
+  h1.page-title.text-center #{title}
+  div.d-flex.justify-content-center.align-items-center.flex-column.m-2.p-2
+    form.d-flex.justify-content-center.align-item-center.flex-column.text-start.p-5.bg-primary-subtle.text-dark.rounded-2.col-6(method="post", action="/admin/user/add/submit")
+        div.mb-3 
+            label.form-label(for="username") Your Name: 
+            input.form-control(type="text", id="username", name="username" placeholder="Enter your name" required)
+        div.mb-3 
+            label.form-label(for="email") Your Email: 
+            input.form-control(type="email", id="email", name="email" placeholder="Enter your Humber email (start with 'N')" required)
+        div.mb-3 
+            label.form-label(for="password") Password: 
+            input.form-control(type="password", id="password", name="password", placeholder="Enter your password" required)
+        button.btn.btn-outline-dark.mb-2(type="submit") Add
+        a.btn.btn-outline-dark(href="/admin/user") Cancel

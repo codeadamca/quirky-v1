@@ -1,0 +1,30 @@
+extends layout
+
+block layout-content
+  include nav.pug
+  h1.text-center.text-primary.mt-4 #{title} 
+  div.m-3.text-end
+    a.btn.btn-dark.my-3(href="/admin/user/add",style="width: 28rem;") + Add new user
+    table.table.table-striped.text-center
+      thead.text-content-center.fs-3.table-primary
+        th(style="width: 10rem;") Name
+        th Email
+        th CreatedAt
+        th Role
+        th Operation 
+      tbody.fs-4 
+        each s in students
+          tr 
+            td.align-middle #{s.username}
+            td.align-middle #{s.email}
+            td.align-middle #{s.createdDateFormatted}
+            td.align-middle #{s.role}
+            td.align-middle
+              form(method="get", action="deleteConfirm")
+                input(type="hidden", name="userId", value=s._id)
+                button.btn.btn-primary.w-100(type="button" onclick=`confirmDelete('${s._id}')`) Delete
+              form(action="/admin/user/edit") 
+                input(type="hidden", name="userId", value=s._id) 
+                button.btn.btn-primary.w-100.my-2(type="submit") Edit
+block scripts
+  script(src="/script/confirmDelete.js")

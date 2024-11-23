@@ -1,7 +1,7 @@
 extends layout 
 
 block layout-content 
-  h1.page-title.text-center Edit the project
+  h1.page-title.text-center.mt-2 #{title}
   //- /admin/menu/add/submit will be the location where the form data is submitted to
   div.d-flex.justify-content-center.align-items-center.flex-column.m-2.p-2
     form.d-flex.justify-content-center.align-item-center.flex-column.text-start.p-5.bg-dark-subtle.text-dark.rounded-2.col-6(method="post", action="/admin/project/edit/submit",enctype="multipart/form-data")
@@ -13,6 +13,8 @@ block layout-content
         div.mb-3
             label.form-label(for="user") User Name: 
             input.form-control(type="text", id="user", name="Github_username" value=editProj.Github_username)
+            .form-text Forgot your username? Go to 
+                a.text-danger.fst-italic(href="https://github.com/") Github
         div.mb-3 
             label.form-label(for="href") URI: 
             input.form-control(type="text", id="href", name="URL", value=editProj.URL)
@@ -24,6 +26,7 @@ block layout-content
             if editProj.screen
             img(src="/img/"+editProj.screen, id="preview",alt="Current Screen", style="max-width: 100%; height: auto;")
             input.form-control(type="file", id="imageName", name="screen")
+            .form-text Note: Recommended size 4:3, and it will be stretched to radio 1:1 on the overview table
         button.btn.btn-primary.mb-2(type="submit") Update the Project
         a.btn.btn-primary(href="/admin/project") Cancel
 

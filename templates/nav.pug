@@ -1,0 +1,18 @@
+nav.navbar.navbar-expand-lg.bg-dark
+    .container-fluid.d-flex.flex-row
+        if (!(title&&title==="Home"))
+            a.navbar-brand.text-light(href='#') Pointless Dictionary
+        button.navbar-toggler(type='button', data-bs-toggle='collapse', data-bs-target='#navbarNavAltMarkup', aria-controls='navbarNavAltMarkup', aria-expanded='false', aria-label='Toggle navigation')
+            span.text-light.navbar-toggler-icon
+        #navbarNavAltMarkup.collapse.navbar-collapse
+        .navbar-nav.d-flex.flex-row(style="--bs-nav-link-padding-y: 0rem;")
+            if (!(title&&title==="Home"))
+                a.nav-link.active.text-light.me-2(aria-current='page', href='/') Home
+            if (!userSession)
+                a.nav-link.bg-light.border.border-light.border-1.rounded-4.px-3.text-dark.text-center.me-3(href='/login') Log in
+                a.nav-link.text-light.border.border-light.border-1.rounded-4.px-3.text-center(href='/register') Sign up
+            if userSession
+                a.nav-link.text-light(href='/logout') Logout
+                a.nav-link.text-light(href='/admin/project') Project
+            if (userSession&&userSession.role==="admin")
+                a.nav-link.text-light(href='/admin/user') User
