@@ -132,7 +132,7 @@ const UserSchema = new mongoose.Schema(
   
   async function deleteUser(id) {
     await connect();
-    let filter = { _id: new ObjectId(id) };
+    let filter = { _id: new mongoose.Types.ObjectId(id) };
     return await Users.deleteOne(filter);
   }
   

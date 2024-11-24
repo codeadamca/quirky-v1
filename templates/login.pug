@@ -8,10 +8,15 @@ block layout-content
         .row.text-center 
         div.col-md-4.offset-md-4
             form(action="/login/submit" method="post")
-                label.form-label(for="email") Email
-                input.form-control.mb-2(type="email" name="email" id="email" placeholder="N01234567@humber.ca" required) 
-                label.form-label(for="password") Password
-                input.form-control.mb-1(type="password" name="password" id="password" required) 
+                .form-group
+                    label.form-label(for="email") Email
+                    input.form-control.mb-2(type="email" name="email" id="email" placeholder="N01234567@humber.ca" required) 
+                .form-group
+                    label.form-label(for="password") Password
+                    input.form-control.mb-1(type="password" name="password" id="password" required) 
+                .form-group
+                    input(type="checkbox", onclick="myFunction()")
+                    label.form-label.ms-2(for="showPassword") Show Password
                 p.small.fw-lighter.fst-italic 
                     | Haven't had an account? Click
                     a.mx-1.fw-bolder(href="/register") here 
@@ -19,3 +24,5 @@ block layout-content
                 div.d-flex.flex-row.justify-content-around
                     input.btn.btn-primary(type="submit", value="Submit")
                     a.btn.btn-primary(href="./") Stay Logout
+block scripts
+    script(src="/script/toggle-password.js")
