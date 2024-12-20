@@ -1,26 +1,46 @@
 extends layout
 
 block layout-content
-  h1.text-center Administer Directory Projects 
+  h1.text-center.mt-4 #{title} - #{userSession.username}
   div.m-3.text-end
     a.btn.btn-primary.my-3(href="/admin/project/add",style="width: 28rem;") + Add new project
     table.table.table-striped.text-center
-      thead.text-content-center.fs-3.table-dark
-        th(style="width: 10rem;") Image
+      thead.text-content-center.fs-3.table-dark 
+        th Image
         th Project
         th Author
+        if(userSession.role==="admin")
+          th CreatedBy
+        th CreatedAt
         th Operation 
       tbody.fs-4 
         each proj in directory
-          tr 
-            td.d-flex.justify-content-center.align-middle
-              img.rounded(src="/img/" + proj.screen)
+          tr
+            td.d-flex.flex-column.justify-content-center.align-items-center
+              img.rounded(src="/img/" + proj.screen style="height: 181.81px;")
             td.align-middle #{proj.website_name}
             td.align-middle #{proj.Github_username}
-            td.align-middle
-              form(method="get", action="/admin/project/delete")
-                input(type="hidden", name="projId", value=proj._id)
-                button.btn.btn-outline-primary.w-100(type="submit") Delete
+            if(userSession.role==="admin")
+              td.align-middle #{proj.createdBy.email}
+            td.align-middle #{proj.createdDateFormatted}
+            td.text-end
+              a.btn.btn-warning.w-75.mb-1(href=proj.GitHub_repo) Repo
+                i.ms-2.fa-brands.fa-github
+              a.btn.btn-info.w-75.mb-1(href=proj.URL) Project
+                i.ms-2.fa-solid.fa-link
               form(action="/admin/project/edit") 
                 input(type="hidden", name="projId", value=proj._id) 
-                button.btn.btn-outline-primary.w-100.my-2(type="submit") Edit
+                button.btn.btn-success.w-75.mb-1(type="submit") Edit
+                  i.ms-2.fa-solid.fa-pen-to-square
+              button.btn.btn-danger.w-75(type="button" onclick=`showConfirmDeleteProj('${proj._id}')`) Delete
+                i.ms-2.fa-solid.fa-trash
+    .confirmDelete.border.border-4.border-secondary.bg-light.m-auto.shadow.p-5.flex-column(style="display:none;position: fixed; top: 30%; left: 50%; transform: translate(-50%, -30%);")
+      p.text-center.text-wrap Are you are you want to delete this project? The action cannot be undo.
+      .d-flex.flex-row.justify-content-evenly.align-items-center.mt-2  
+        form(method="get", action="/admin/project/delete") 
+          input(type="hidden", name="projId", value="")
+          button.btn.btn-danger.px-4(type="submit") Delete
+        button.btn.btn-secondary.px-4(type="button" onclick="closeConfirmDelete()") Cancel
+                  
+block scripts
+  script(src="/script/confirmDelete.js")

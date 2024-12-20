@@ -1,0 +1,31 @@
+extends layout 
+
+block layout-content
+    .container.d-flex.flex-column.mt-5.mb-3.justify-content-center(style="min-height:75vh;")
+        h2.text-center.fw-bolder.text-primary #{title}
+        if messages.error
+            p.text-danger.text-center.small #{messages.error}
+        .row.text-center 
+        div.col-md-4.offset-md-4
+            form(action="/register" method="post")
+                .form-group
+                    label.form-label(for="name") Name
+                    input.form-control.mb-2(type="text" name="name" id="name" placeholder= "Enter Your Student Name on BB" required) 
+                .form-group
+                    label.form-label(for="email") Email
+                    input.form-control.mb-2(type="email" name="email" id="email" placeholder = "Enter Humber Email (start with 'N')" required) 
+                .form-group
+                    label.form-label(for="password") Password
+                    input.form-control.mb-1(type="password" name="password" id="password" required)
+                .form-group
+                    input(type="checkbox", onclick="myFunction()")
+                    label.form-label.ms-2(for="showPassword") Show Password 
+                p.small.fw-lighter.fst-italic 
+                    | Already have an account? Click
+                    a.mx-1.fe-bolder(href="/login") here 
+                    | to login
+                div.d-flex.flex-row.justify-content-around
+                    input.btn.btn-primary(type="submit", value="Submit")
+                    a.btn.btn-primary(href="./") Stay Logout
+    block scripts
+    script(src="/script/toggle-password.js")

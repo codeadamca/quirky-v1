@@ -27,20 +27,17 @@ body {
     color: rgba(255, 255, 255, 0.6);
 }
 
-.card{
-    width: 18rem;
-    height: 300px;
-    margin: 1em;
-}
 
 .rounded{
-    width: 10rem;
-    height: 160px;
+    width: 12rem;
+    object-fit: cover; 
 }
+
 
 .singleImg{
     width: 13rem;
-    height: 200px;
+    height: 12.5rem;
+    object-fit: cover;
 }
 
 .card-img-top:hover{
@@ -52,13 +49,12 @@ figcaption p,
     font-family: Lato;
     font-weight: 400;
     font-style: normal;
-    font-size: 2em;
-    margin-top: 0;
 }
 
 .project {
     display: none;
 } 
+
 .project{
     flex-direction: column;
     background-color: white;
@@ -70,6 +66,12 @@ figcaption p,
 }
 
 .hide{
-    display: none !important;
+    display: none;
 }
+
+
+.display{
+    display:flex;
+}
+
 
